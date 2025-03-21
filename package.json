@@ -1,5 +1,5 @@
 {
-  "name": "atv-lib",
+  "name": "@ava-brn/lib-android-tv",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
