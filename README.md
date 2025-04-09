@@ -3,9 +3,6 @@
 [![npm-version](https://badgen.net/npm/v/androidtv-remote)](https://www.npmjs.com/package/androidtv-remote)
 [![npm-total-downloads](https://badgen.net/npm/dt/androidtv-remote)](https://www.npmjs.com/package/androidtv-remote)
 
-[![Donate](https://badgen.net/badge/paypal/donate?icon=https://simpleicons.now.sh/paypal/fff)](https://www.paypal.com/donate/?hosted_button_id=B8NGNPFGK69BY)
-[![Donate](https://badgen.net/badge/buymeacoffee/donate?icon=https://simpleicons.now.sh/buymeacoffee/fff)](https://www.buymeacoffee.com/louis49github)
-
 # Installation
 
 ```
@@ -97,7 +94,7 @@ Emitted when androidtv has a problem : by example when you send a wrong app_link
 # Others
 
 * If you need to decrypt some new messages from android TV, pass an Hexa form of buffer here : https://protogen.marcgravell.com/decode
-* You can take a look at my other package for homebridge that use this current one: [homebridge-plugin-androidtv](https://github.com/louis49/homebridge-plugin-androidtv)
+* You can take a look at louis49 other package for homebridge that use this current one: [homebridge-plugin-androidtv](https://github.com/louis49/homebridge-plugin-androidtv)
 
 # License
 
