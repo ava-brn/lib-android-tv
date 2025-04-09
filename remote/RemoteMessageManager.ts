@@ -1,122 +1,121 @@
-import protobufjs from "protobufjs";
-import { system } from "systeminformation"
-import * as path from "path";
+import protobufjs from 'protobufjs';
+import * as path from 'path';
+import RemoteMessage from './RemoteMessage';
 
-import { fileURLToPath } from 'url';
-import { dirname } from "path";
-const directory = dirname(fileURLToPath(import.meta.url));
+const directory = __dirname;
 
-class RemoteMessageManager {
-    constructor() {
-        this.root = protobufjs.loadSync(path.join(directory,"remotemessage.proto"));
-        this.RemoteMessage = this.root.lookupType("remote.RemoteMessage");
-        this.RemoteKeyCode = this.root.lookupEnum("remote.RemoteKeyCode").values;
-        this.RemoteDirection = this.root.lookupEnum("remote.RemoteDirection").values;
+export default class RemoteMessageManager {
+    private root: protobufjs.Root;
+    private RemoteMessage: protobufjs.Type;
+    public RemoteKeyCode: { [key: string]: number };
+    public RemoteDirection: { [key: string]: number };
+    private readonly debug: boolean;
 
-        system().then((data) => {
-            this.manufacturer = data.manufacturer;
-            this.model = data.model;
-        });
+    constructor(debug: boolean = false) {
+        this.root = protobufjs.loadSync(path.join(directory, 'remotemessage.proto'));
+        this.RemoteMessage = this.root.lookupType('remote.RemoteMessage');
+        this.RemoteKeyCode = this.root.lookupEnum('remote.RemoteKeyCode').values;
+        this.RemoteDirection = this.root.lookupEnum('remote.RemoteDirection').values;
+        this.debug = debug;
     }
 
-    create(payload){
-        if(!payload.remotePingResponse){
-            console.debug("Create Remote " + JSON.stringify(payload));
+    create(payload: any): Uint8Array {
+        if (!payload.remotePingResponse) {
+            if (this.debug) {
+                console.debug('Create Remote ' + JSON.stringify(payload));
+            }
         }
 
-        let errMsg = this.RemoteMessage.verify(payload);
-        if (errMsg)
-            throw Error(errMsg);
+        const errMsg = this.RemoteMessage.verify(payload);
+        if (errMsg) {
+            throw new Error(errMsg);
+        }
 
-        let message = this.RemoteMessage.create(payload);
+        const message = this.RemoteMessage.create(payload);
+        const array = this.RemoteMessage.encodeDelimited(message).finish();
 
-        let array = this.RemoteMessage.encodeDelimited(message).finish()
-
-        if(!payload.remotePingResponse){
-            //console.debug("Sending " + Array.from(array));
-            console.debug("Sending " + JSON.stringify(message.toJSON()));
+        if (!payload.remotePingResponse) {
+            if (this.debug) {
+                console.debug('Sending ' + JSON.stringify(message.toJSON()));
+            }
         }
 
         return array;
     }
 
-    createRemoteConfigure(code1, model, vendor, unknown1, unknown2){
+    createRemoteConfigure(code1: number, model: string, vendor: string, unknown1: number, unknown2: string): Uint8Array {
         return this.create({
-            remoteConfigure:{
-                code1 : 622,
-                deviceInfo : {
-                    model : this.model,
-                    vendor : this.manufacturer,
-                    unknown1 : 1,
-                    unknown2 : "1",
-                    packageName : "androidtv-remote",
-                    appVersion : "1.0.0",
-                }
-            }
+            remoteConfigure: {
+                code1: code1,
+                deviceInfo: {
+                    model: model,
+                    vendor: vendor,
+                    unknown1: 1,
+                    unknown2: '1',
+                    packageName: 'androidtv-remote',
+                    appVersion: '1.0.0',
+                },
+            },
         });
     }
 
-    createRemoteSetActive(active){
+    createRemoteSetActive(active: number): Uint8Array {
         return this.create({
-            remoteSetActive:{
-                active:active,
-            }
+            remoteSetActive: {
+                active: active,
+            },
         });
     }
 
-    createRemotePingResponse(val1){
+    createRemotePingResponse(val1: number): Uint8Array {
         return this.create({
-            remotePingResponse:{
-                val1:val1,
-            }
+            remotePingResponse: {
+                val1: val1,
+            },
         });
     }
 
-    createRemoteKeyInject(direction, keyCode) {
+    createRemoteKeyInject(direction: number, keyCode: number): Uint8Array {
         return this.create({
-            remoteKeyInject:{
-                keyCode : keyCode,
-                direction : direction,
-            }
+            remoteKeyInject: {
+                keyCode: keyCode,
+                direction: direction,
+            },
         });
     }
 
-    createRemoteAdjustVolumeLevel(level) {
+    createRemoteAdjustVolumeLevel(level: number): Uint8Array {
         return this.create({
-            remoteAdjustVolumeLevel : level,
+            remoteAdjustVolumeLevel: level,
         });
     }
 
-    createRemoteResetPreferredAudioDevice() {
+    createRemoteResetPreferredAudioDevice(): Uint8Array {
         return this.create({
-            remoteResetPreferredAudioDevice : {},
+            remoteResetPreferredAudioDevice: {},
         });
     }
 
-    createRemoteImeKeyInject(appPackage, status) {
+    createRemoteImeKeyInject(appPackage: string, status: number): Uint8Array {
         return this.create({
             remoteImeKeyInject: {
-                textFieldStatus : status,
-                appInfo:{
-                    appPackage:appPackage,
-                }
-            }
+                textFieldStatus: status,
+                appInfo: {
+                    appPackage: appPackage,
+                },
+            },
         });
     }
 
-    createRemoteRemoteAppLinkLaunchRequest(app_link) {
+    createRemoteRemoteAppLinkLaunchRequest(appLink: string): Uint8Array {
         return this.create({
-            remoteAppLinkLaunchRequest : {
-                appLink : app_link
-            }
+            remoteAppLinkLaunchRequest: {
+                appLink: appLink,
+            },
         });
     }
 
-    parse(buffer){
-        return this.RemoteMessage.decodeDelimited(buffer);
+    parse(buffer: Uint8Array): RemoteMessage {
+        return this.RemoteMessage.decodeDelimited(buffer) as RemoteMessage;
     }
-
 }
-let remoteMessageManager = new RemoteMessageManager();
-
-export { remoteMessageManager };

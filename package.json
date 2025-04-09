@@ -1,39 +1,27 @@
 {
-  "name": "androidtv-remote",
-  "version": "1.0.10",
-  "description": "AndroidTV Remote",
+  "name": "@ava-brn/lib-android-tv",
+  "version": "1.0.0",
+  "description": "",
   "main": "dist/index.js",
-  "engines": {
-    "node": ">=14.18.1"
-  },
   "scripts": {
-    "babel": "babel ./src/*.* --out-dir dist --delete-dir-on-start -D && babel ./src/certificate/*.* --out-dir dist/certificate -D && babel ./src/pairing/*.* --out-dir dist/pairing -D && babel ./src/remote/*.* --out-dir dist/remote -D"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "postbuild": "npx copyfiles **/*.proto dist/"
   },
-  "keywords": [
-    "androidtv",
-    "remote",
-    "freebox",
-    "freebox-player-pop",
-    "freebox-mini-4k"
-  ],
-  "author": "@louis49",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "crypto-js": "^4.1.1",
-    "node-forge": "^0.10.0",
-    "protobufjs": "^6.11.2",
-    "systeminformation": "^5.9.17",
-    "core-js": "^3.20.2"
+    "node-forge": "^1.3.1",
+    "protobufjs": "^6.11.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.7",
-    "@babel/core": "^7.16.7",
-    "@babel/preset-env": "^7.0.0",
-    "babel-plugin-transform-import-meta": "^2.1.0"
-  },
-  "type": "commonjs",
-  "homepage": "https://github.com/louis49/androidtv-remote",
-  "bugs": {
-    "url": "https://github.com/louis49/androidtv-remote/issues"
+    "@tsconfig/node18": "^1.0.3",
+    "@types/crypto-js": "^4.1.2",
+    "@types/node": "^18.11.13",
+    "@types/node-forge": "^1.3.6",
+    "@types/source-map-support": "^0.5.4",
+    "native-copyfiles": "^0.3.2",
+    "typescript": "^4.9.4"
   }
 }

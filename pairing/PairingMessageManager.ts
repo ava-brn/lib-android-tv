@@ -1,89 +1,81 @@
-import protobufjs from "protobufjs";
-import {system} from "systeminformation";
-import * as path from "path";
+import * as protobufjs from 'protobufjs';
+import * as path from 'path';
 
-import { fileURLToPath } from 'url';
-import { dirname } from "path";
-const directory = dirname(fileURLToPath(import.meta.url));
+const directory = __dirname;
 
-class PairingMessageManager {
-    constructor(){
-        this.root = protobufjs.loadSync(path.join(directory,"pairingmessage.proto"));
+export default class PairingMessageManager {
+    private root: protobufjs.Root;
+    private PairingMessage: protobufjs.Type;
+    public Status: { [key: string]: number };
+    private RoleType: { [key: string]: number };
+    private EncodingType: { [key: string]: number };
 
-        this.PairingMessage = this.root.lookupType("pairing.PairingMessage");
-        this.Status = this.root.lookupEnum("pairing.PairingMessage.Status").values;
-        this.RoleType = this.root.lookupEnum("RoleType").values;
-        this.EncodingType = this.root.lookupEnum("pairing.PairingEncoding.EncodingType").values;
+    constructor() {
+        this.root = protobufjs.loadSync(path.join(directory, 'pairingmessage.proto'));
 
-        system().then((data) => {
-            pairingMessageManager.manufacturer = data.manufacturer;
-            pairingMessageManager.model = data.model;
-        });
+        this.PairingMessage = this.root.lookupType('pairing.PairingMessage');
+        this.Status = this.root.lookupEnum('pairing.PairingMessage.Status').values;
+        this.RoleType = this.root.lookupEnum('RoleType').values;
+        this.EncodingType = this.root.lookupEnum('pairing.PairingEncoding.EncodingType').values;
     }
 
-    create(payload){
-        let errMsg = this.PairingMessage.verify(payload);
-        if (errMsg)
-            throw Error(errMsg);
+    create(payload: any): Uint8Array {
+        const errMsg = this.PairingMessage.verify(payload);
+        if (errMsg) { throw new Error(errMsg); }
 
-        let message = this.PairingMessage.create(payload);
+        const message = this.PairingMessage.create(payload);
 
         return this.PairingMessage.encodeDelimited(message).finish();
     }
 
-    createPairingRequest(service_name){
+    createPairingRequest(service_name: string, model: string): Uint8Array {
         return this.create({
             pairingRequest: {
                 serviceName: service_name,
-                clientName: this.model,
+                clientName: model,
             },
             status: this.Status.STATUS_OK,
-            protocolVersion: 2
+            protocolVersion: 2,
         });
     }
 
-    createPairingOption(){
+    createPairingOption(): Uint8Array {
         return this.create({
             pairingOption: {
-                preferredRole : this.RoleType.ROLE_TYPE_INPUT,
-                inputEncodings : [{
-                    type : this.EncodingType.ENCODING_TYPE_HEXADECIMAL,
-                    symbolLength : 6
-                }]
+                preferredRole: this.RoleType.ROLE_TYPE_INPUT,
+                inputEncodings: [{
+                    type: this.EncodingType.ENCODING_TYPE_HEXADECIMAL,
+                    symbolLength: 6,
+                }],
             },
             status: this.Status.STATUS_OK,
-            protocolVersion: 2
+            protocolVersion: 2,
         });
     }
 
-    createPairingConfiguration(){
+    createPairingConfiguration(): Uint8Array {
         return this.create({
             pairingConfiguration: {
-                clientRole : this.RoleType.ROLE_TYPE_INPUT,
-                encoding : {
-                    type : this.EncodingType.ENCODING_TYPE_HEXADECIMAL,
-                    symbolLength : 6
-                }
+                clientRole: this.RoleType.ROLE_TYPE_INPUT,
+                encoding: {
+                    type: this.EncodingType.ENCODING_TYPE_HEXADECIMAL,
+                    symbolLength: 6,
+                },
             },
             status: this.Status.STATUS_OK,
-            protocolVersion: 2
+            protocolVersion: 2,
         });
     }
 
-    createPairingSecret(secret){
+    createPairingSecret(secret: Array<String | Number>): Uint8Array {
         return this.create({
-            pairingSecret: {
-                secret : secret
-            },
+            pairingSecret: { secret: secret },
             status: this.Status.STATUS_OK,
-            protocolVersion: 2
+            protocolVersion: 2,
         });
     }
 
-    parse(buffer){
-        return this.PairingMessage.decodeDelimited(buffer);
+    parse(buffer: Uint8Array): PairingMessage {
+        return this.PairingMessage.decodeDelimited(buffer) as PairingMessage;
     }
-
 }
-let pairingMessageManager = new PairingMessageManager()
-export { pairingMessageManager };
