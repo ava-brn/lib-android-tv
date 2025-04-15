@@ -81,10 +81,10 @@ class PairingManager extends events_1.EventEmitter {
                 reject(false);
                 return;
             }
-            const connectionTimeout = setTimeout(() => {
-                this.emit('log.info', 'Connection timeout reached.');
+            let connectionTimeout = setTimeout(() => {
+                this.emit('log.info', 'Inital connection timeout reached.');
                 this.client?.destroy();
-                reject('Timeout');
+                reject('ConnectTimeout');
             }, 5000);
             this.client.on('secureConnect', () => {
                 this.emit('log.debug', this.host + ' Pairing secure connected ');
