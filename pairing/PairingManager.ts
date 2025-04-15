@@ -136,11 +136,6 @@ export class PairingManager extends EventEmitter {
                 this.emit('log.error', error);
                 reject(error);
             });
-
-            this.client.setTimeout(7500, () => {
-                this.emit('log.debug', 'Timeout connecting to device');
-                reject('Timeout');
-            })
         });
     }
 
