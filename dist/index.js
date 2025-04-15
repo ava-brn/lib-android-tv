@@ -84,6 +84,7 @@ class AndroidRemote extends events_1.default {
         };
     }
     stop() {
+        this.pairingManager?.stop();
         this.remoteManager?.stop();
     }
 }

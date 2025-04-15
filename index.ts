@@ -115,6 +115,7 @@ class AndroidRemote extends EventEmitter {
     }
 
     stop(): void {
+        this.pairingManager?.stop();
         this.remoteManager?.stop();
     }
 }
