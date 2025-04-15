@@ -81,8 +81,14 @@ class PairingManager extends events_1.EventEmitter {
                 reject(false);
                 return;
             }
+            const connectionTimeout = setTimeout(() => {
+                this.emit('log.info', 'Connection timeout reached.');
+                this.client?.destroy();
+                reject('Timeout');
+            });
             this.client.on('secureConnect', () => {
                 this.emit('log.debug', this.host + ' Pairing secure connected ');
+                clearTimeout(connectionTimeout);
                 this.client?.write(this.pairingMessageManager.createPairingRequest(this.service_name, 'ava-model'));
             });
             this.client.on('data', (data) => {
