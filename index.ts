@@ -58,7 +58,7 @@ class AndroidRemote extends EventEmitter {
                 .catch((error) => {
                     console.error(error);
                     this.emit('log.error', 'pairing manager start', error);
-                    throw error;
+                    // throw error;
                 });
 
             if (!paired) {
