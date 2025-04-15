@@ -42,12 +42,11 @@ class AndroidRemote extends events_1.default {
             this.pairingManager.on('log.error', (...args) => this.emit('log.error', args));
             let paired = await this.pairingManager.start()
                 .catch((error) => {
-                console.error(error);
                 this.emit('log.error', 'pairing manager start', error);
-                // throw error;
+                throw error;
             });
             if (!paired) {
-                return;
+                throw new Error('Not paired');
             }
         }
         this.remoteManager = new RemoteManager_1.RemoteManager(this.host, this.remote_port, this.cert, this.timeout);

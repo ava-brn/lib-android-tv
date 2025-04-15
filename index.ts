@@ -56,13 +56,12 @@ class AndroidRemote extends EventEmitter {
 
             let paired = await this.pairingManager.start()
                 .catch((error) => {
-                    console.error(error);
                     this.emit('log.error', 'pairing manager start', error);
-                    // throw error;
+                    throw error;
                 });
 
             if (!paired) {
-                return;
+                throw new Error('Not paired');
             }
         }
 
