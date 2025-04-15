@@ -4,7 +4,7 @@ import { RemoteManager } from './remote/RemoteManager';
 import RemoteMessageManager from './remote/RemoteMessageManager';
 import EventEmitter from 'events';
 
-export class AndroidRemote extends EventEmitter {
+class AndroidRemote extends EventEmitter {
     private host: string;
     private cert: { key: string | undefined; cert: string | undefined };
     private pairing_port: number;
@@ -121,7 +121,7 @@ export class AndroidRemote extends EventEmitter {
 let RemoteKeyCode = (new RemoteMessageManager).RemoteKeyCode;
 let RemoteDirection = (new RemoteMessageManager).RemoteDirection;
 
-export default {
+export {
     AndroidRemote,
     CertificateGenerator,
     RemoteKeyCode,

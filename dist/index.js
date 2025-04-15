@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AndroidRemote = void 0;
+exports.RemoteDirection = exports.RemoteKeyCode = exports.CertificateGenerator = exports.AndroidRemote = void 0;
 const CertificateGenerator_1 = require("./certificate/CertificateGenerator");
+Object.defineProperty(exports, "CertificateGenerator", { enumerable: true, get: function () { return CertificateGenerator_1.CertificateGenerator; } });
 const PairingManager_1 = require("./pairing/PairingManager");
 const RemoteManager_1 = require("./remote/RemoteManager");
 const RemoteMessageManager_1 = __importDefault(require("./remote/RemoteMessageManager"));
@@ -87,13 +88,9 @@ class AndroidRemote extends events_1.default {
 }
 exports.AndroidRemote = AndroidRemote;
 let RemoteKeyCode = (new RemoteMessageManager_1.default).RemoteKeyCode;
+exports.RemoteKeyCode = RemoteKeyCode;
 let RemoteDirection = (new RemoteMessageManager_1.default).RemoteDirection;
-exports.default = {
-    AndroidRemote,
-    CertificateGenerator: CertificateGenerator_1.CertificateGenerator,
-    RemoteKeyCode,
-    RemoteDirection,
-};
+exports.RemoteDirection = RemoteDirection;
 module.exports = {
     AndroidRemote,
     CertificateGenerator: CertificateGenerator_1.CertificateGenerator,
