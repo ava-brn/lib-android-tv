@@ -1,6 +1,6 @@
-import {CertificateGenerator} from './certificate/CertificateGenerator';
-import {PairingManager} from './pairing/PairingManager';
-import {RemoteManager} from './remote/RemoteManager';
+import { CertificateGenerator } from './certificate/CertificateGenerator';
+import { PairingManager } from './pairing/PairingManager';
+import { RemoteManager } from './remote/RemoteManager';
 import RemoteMessageManager from './remote/RemoteMessageManager';
 import EventEmitter from 'events';
 
@@ -122,6 +122,13 @@ let RemoteKeyCode = (new RemoteMessageManager).RemoteKeyCode;
 let RemoteDirection = (new RemoteMessageManager).RemoteDirection;
 
 export default {
+    AndroidRemote,
+    CertificateGenerator,
+    RemoteKeyCode,
+    RemoteDirection,
+};
+
+module.exports = {
     AndroidRemote,
     CertificateGenerator,
     RemoteKeyCode,
