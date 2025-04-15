@@ -1,15 +1,9 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AndroidRemote = void 0;
-const CertificateGenerator_1 = require("./certificate/CertificateGenerator");
-const PairingManager_1 = require("./pairing/PairingManager");
-const RemoteManager_1 = require("./remote/RemoteManager");
-const RemoteMessageManager_1 = __importDefault(require("./remote/RemoteMessageManager"));
-const events_1 = __importDefault(require("events"));
-class AndroidRemote extends events_1.default {
+import { CertificateGenerator } from './certificate/CertificateGenerator';
+import { PairingManager } from './pairing/PairingManager';
+import { RemoteManager } from './remote/RemoteManager';
+import RemoteMessageManager from './remote/RemoteMessageManager';
+import EventEmitter from 'events';
+export class AndroidRemote extends EventEmitter {
     host;
     cert;
     pairing_port;
@@ -32,8 +26,8 @@ class AndroidRemote extends events_1.default {
     }
     async start() {
         if (!this.cert.key || !this.cert.cert) {
-            this.cert = CertificateGenerator_1.CertificateGenerator.generateFull(this.service_name, 'CNT', 'ST', 'LOC', 'O', 'OU');
-            this.pairingManager = new PairingManager_1.PairingManager(this.host, this.pairing_port, this.cert, this.service_name);
+            this.cert = CertificateGenerator.generateFull(this.service_name, 'CNT', 'ST', 'LOC', 'O', 'OU');
+            this.pairingManager = new PairingManager(this.host, this.pairing_port, this.cert, this.service_name);
             this.pairingManager.on('secret', () => this.emit('secret'));
             this.pairingManager.on('log', (...args) => this.emit('log', args));
             this.pairingManager.on('log.debug', (...args) => this.emit('log.debug', args));
@@ -47,7 +41,7 @@ class AndroidRemote extends events_1.default {
                 return;
             }
         }
-        this.remoteManager = new RemoteManager_1.RemoteManager(this.host, this.remote_port, this.cert, this.timeout);
+        this.remoteManager = new RemoteManager(this.host, this.remote_port, this.cert, this.timeout);
         this.remoteManager.on('powered', (powered) => this.emit('powered', powered));
         this.remoteManager.on('volume', (volume) => this.emit('volume', volume));
         this.remoteManager.on('current_app', (current_app) => this.emit('current_app', current_app));
@@ -85,12 +79,11 @@ class AndroidRemote extends events_1.default {
         this.remoteManager?.stop();
     }
 }
-exports.AndroidRemote = AndroidRemote;
-let RemoteKeyCode = (new RemoteMessageManager_1.default).RemoteKeyCode;
-let RemoteDirection = (new RemoteMessageManager_1.default).RemoteDirection;
-exports.default = {
+let RemoteKeyCode = (new RemoteMessageManager).RemoteKeyCode;
+let RemoteDirection = (new RemoteMessageManager).RemoteDirection;
+export default {
     AndroidRemote,
-    CertificateGenerator: CertificateGenerator_1.CertificateGenerator,
+    CertificateGenerator,
     RemoteKeyCode,
     RemoteDirection,
 };

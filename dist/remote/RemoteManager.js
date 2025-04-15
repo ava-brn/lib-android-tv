@@ -1,13 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RemoteManager = void 0;
-const tls_1 = __importDefault(require("tls"));
-const RemoteMessageManager_1 = __importDefault(require("./RemoteMessageManager"));
-const events_1 = __importDefault(require("events"));
-class RemoteManager extends events_1.default {
+import tls from 'tls';
+import RemoteMessageManager from './RemoteMessageManager';
+import EventEmitter from 'events';
+export class RemoteManager extends EventEmitter {
     host;
     port;
     certs;
@@ -24,7 +18,7 @@ class RemoteManager extends events_1.default {
         this.chunks = Buffer.from([]);
         this.error = null;
         this.timeout = timeout;
-        this.remoteMessageManager = new RemoteMessageManager_1.default();
+        this.remoteMessageManager = new RemoteMessageManager();
     }
     async start() {
         return new Promise((resolve, reject) => {
@@ -36,7 +30,7 @@ class RemoteManager extends events_1.default {
                 rejectUnauthorized: false,
             };
             this.emit('log.debug', 'Start Remote Connect');
-            this.client = tls_1.default.connect(options, () => {
+            this.client = tls.connect(options, () => {
                 this.emit('log.debug', "Remote connected");
             });
             this.client.on('timeout', () => {
@@ -177,5 +171,4 @@ class RemoteManager extends events_1.default {
         this.client?.destroy();
     }
 }
-exports.RemoteManager = RemoteManager;
 //# sourceMappingURL=RemoteManager.js.map

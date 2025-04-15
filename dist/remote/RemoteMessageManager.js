@@ -1,42 +1,14 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const protobufjs_1 = __importDefault(require("protobufjs"));
-const path = __importStar(require("path"));
+import protobufjs from 'protobufjs';
+import * as path from 'path';
 const directory = __dirname;
-class RemoteMessageManager {
+export default class RemoteMessageManager {
     root;
     RemoteMessage;
     RemoteKeyCode;
     RemoteDirection;
     debug;
     constructor(debug = false) {
-        this.root = protobufjs_1.default.loadSync(path.join(directory, 'remotemessage.proto'));
+        this.root = protobufjs.loadSync(path.join(directory, 'remotemessage.proto'));
         this.RemoteMessage = this.root.lookupType('remote.RemoteMessage');
         this.RemoteKeyCode = this.root.lookupEnum('remote.RemoteKeyCode').values;
         this.RemoteDirection = this.root.lookupEnum('remote.RemoteDirection').values;
@@ -129,5 +101,4 @@ class RemoteMessageManager {
         return this.RemoteMessage.decodeDelimited(buffer);
     }
 }
-exports.default = RemoteMessageManager;
 //# sourceMappingURL=RemoteMessageManager.js.map

@@ -1,14 +1,8 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PairingManager = void 0;
-const tls_1 = __importDefault(require("tls"));
-const crypto_js_1 = __importDefault(require("crypto-js"));
-const events_1 = require("events");
-const PairingMessageManager_1 = __importDefault(require("./PairingMessageManager"));
-class PairingManager extends events_1.EventEmitter {
+import tls from 'tls';
+import Crypto from 'crypto-js';
+import { EventEmitter } from 'events';
+import PairingMessageManager from './PairingMessageManager';
+export class PairingManager extends EventEmitter {
     host;
     port;
     chunks;
@@ -23,7 +17,7 @@ class PairingManager extends events_1.EventEmitter {
         this.chunks = Buffer.from([]);
         this.certs = certs;
         this.service_name = service_name;
-        this.pairingMessageManager = new PairingMessageManager_1.default();
+        this.pairingMessageManager = new PairingMessageManager();
     }
     sendCode(code) {
         this.emit('log.debug', 'Sending code : ', code);
@@ -38,7 +32,7 @@ class PairingManager extends events_1.EventEmitter {
             this.client.destroy(new Error('No certificate'));
             return false;
         }
-        let sha256 = crypto_js_1.default.algo.SHA256.create();
+        let sha256 = Crypto.algo.SHA256.create();
         if (client_certificate.modulus === undefined
             || client_certificate.exponent === undefined
             || server_certificate.modulus === undefined
@@ -46,11 +40,11 @@ class PairingManager extends events_1.EventEmitter {
             this.client.destroy(new Error('No certificate'));
             return false;
         }
-        sha256.update(crypto_js_1.default.enc.Hex.parse(client_certificate.modulus));
-        sha256.update(crypto_js_1.default.enc.Hex.parse("0" + client_certificate.exponent.slice(2)));
-        sha256.update(crypto_js_1.default.enc.Hex.parse(server_certificate.modulus));
-        sha256.update(crypto_js_1.default.enc.Hex.parse("0" + server_certificate.exponent.slice(2)));
-        sha256.update(crypto_js_1.default.enc.Hex.parse(code.slice(2)));
+        sha256.update(Crypto.enc.Hex.parse(client_certificate.modulus));
+        sha256.update(Crypto.enc.Hex.parse("0" + client_certificate.exponent.slice(2)));
+        sha256.update(Crypto.enc.Hex.parse(server_certificate.modulus));
+        sha256.update(Crypto.enc.Hex.parse("0" + server_certificate.exponent.slice(2)));
+        sha256.update(Crypto.enc.Hex.parse(code.slice(2)));
         let hash = sha256.finalize();
         let hash_array = this.hexStringToBytes(hash.toString());
         let check = hash_array[0];
@@ -73,7 +67,7 @@ class PairingManager extends events_1.EventEmitter {
                 rejectUnauthorized: false,
             };
             this.emit('log.debug', 'Start Pairing Connect');
-            this.client = tls_1.default.connect(options, () => {
+            this.client = tls.connect(options, () => {
                 this.emit('log.debug', this.host + ' Pairing connected');
             });
             if (!this.client) {
@@ -142,5 +136,4 @@ class PairingManager extends events_1.EventEmitter {
         return bytes;
     }
 }
-exports.PairingManager = PairingManager;
 //# sourceMappingURL=PairingManager.js.map

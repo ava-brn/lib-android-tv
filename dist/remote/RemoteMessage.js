@@ -1,6 +1,4 @@
-"use strict";
 // TypeScript interfaces corresponding to the remotemessage.proto file
-Object.defineProperty(exports, "__esModule", { value: true });
 var RemoteKeyCode;
 (function (RemoteKeyCode) {
     RemoteKeyCode[RemoteKeyCode["KeycodeUnknown"] = 0] = "KeycodeUnknown";
@@ -316,4 +314,5 @@ var RemoteDirection;
     RemoteDirection[RemoteDirection["EndLong"] = 2] = "EndLong";
     RemoteDirection[RemoteDirection["Short"] = 3] = "Short";
 })(RemoteDirection || (RemoteDirection = {}));
+export {};
 //# sourceMappingURL=RemoteMessage.js.map
