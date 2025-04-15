@@ -137,6 +137,9 @@ class PairingManager extends events_1.EventEmitter {
             });
         });
     }
+    stop() {
+        this.client?.destroy();
+    }
     hexStringToBytes(q) {
         const bytes = [];
         for (let i = 0; i < q.length; i += 2) {

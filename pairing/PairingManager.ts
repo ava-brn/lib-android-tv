@@ -146,6 +146,10 @@ export class PairingManager extends EventEmitter {
         });
     }
 
+    stop(): void {
+        this.client?.destroy();
+    }
+
     private hexStringToBytes(q: string): number[] {
         const bytes: number[] = [];
         for (let i = 0; i < q.length; i += 2) {
