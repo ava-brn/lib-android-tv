@@ -56,7 +56,7 @@ export class PairingManager extends Client {
 
             clearTimeout(connectionTimeout);
 
-            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, 'ava-model'));
+            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, this.serviceName));
         });
     }
 

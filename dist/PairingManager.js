@@ -49,7 +49,7 @@ class PairingManager extends Client_1.Client {
             }, this.connectionTimeout);
             await this.connect().catch((error) => reject(error));
             clearTimeout(connectionTimeout);
-            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, 'ava-model'));
+            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, this.serviceName));
         });
     }
     async sendCode(code) {

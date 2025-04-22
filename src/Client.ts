@@ -43,7 +43,9 @@ export class Client extends EventEmitter {
                 }
 
                 this.emit('log', 'Socket exists, but not connecting. Destroy and try again');
+                this.socket.removeAllListeners();
                 this.socket.destroy();
+                this.removeAllListeners();
             }
 
             this.emit('log', 'Creating socket');
