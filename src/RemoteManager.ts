@@ -20,11 +20,9 @@ export class RemoteManager extends Client {
     async connect(): Promise<boolean> {
         this.on('raw', (buffer) => {
             const message = this.remoteMessageManager.parse(buffer);
-            this.emit('log', this.host + ' Receive : ' + JSON.stringify(message));
             
             if (!message.remotePingRequest) {
-                //this.emit('log.debug', this.host + " Receive : " + Array.from(this.chunks));
-                
+                this.emit('log', this.host + ' Receive : ' + JSON.stringify(message));                
             }
 
             if (message.remoteConfigure) {
