@@ -1,7 +1,7 @@
 import readline from 'node:readline';
 import util from 'node:util';
 
-import { AndroidRemote, RemoteKeyCode, RemoteDirection } from './dist/index.js';
+import { RemoteKeyCode, RemoteDirection } from './dist/index.js';
 import { PairingManager } from './dist/PairingManager.js';
 import { RemoteManager } from './dist/RemoteManager.js';
 import { CertificateGenerator } from "./dist/CertificateGenerator.js";
@@ -28,8 +28,8 @@ const cert = certstr.length ? JSON.parse(certstr) : CertificateGenerator.generat
   'OU'
 );
 
-const remote = new RemoteManager('10.0.0.144', 6466, cert);
-const pairer = new PairingManager('10.0.0.144', 6467, cert.key, cert.cert, 5000, SERVICE_NAME);
+const remote = new RemoteManager('10.0.0.143', 6466, cert.key, cert.cert, 5000);
+const pairer = new PairingManager('10.0.0.143', 6467, cert.key, cert.cert, 5000, SERVICE_NAME);
 
 pairer.on('log.debug', (...args) => console.log('[DEBUG]', ...args));
 pairer.on('log.info', (...args) => console.log('[INFO]', ...args));
@@ -42,6 +42,7 @@ pairer.on('message', (msg) => console.log('[MSG]', msg));
 remote.on('log.debug', (...args) => console.log('[RDEBUG]', ...args));
 remote.on('log.info', (...args) => console.log('[RINFO]', ...args));
 remote.on('log.error', (...args) => console.log('[RERROR]', ...args));
+remote.on('log', (...args) => console.log('[RLOG]', ...args));
 remote.on('message', (msg) => console.log('[RMSG]', msg));
 
 // console.log('PAIR: Init connection');
@@ -63,6 +64,16 @@ process.on('SIGINT', async () => {
 if (certstr) {
   pairer.on('message', console.log);
   await remote.start().catch((e) => console.log('Start error', e));
+  console.log('Connected. Waiting for 2s');  await new Promise(r => setTimeout(r, 15000));
+
+  remote.sendKey(RemoteKeyCode.KEYCODE_DPAD_DOWN, RemoteDirection.SHORT);
+
+  await new Promise(r => setTimeout(r, 5000));
+
+  remote.sendKey(RemoteKeyCode.KEYCODE_MUTE, RemoteDirection.SHORT);
+
+  await new Promise(r => setTimeout(r, 1000));
+
   await question('Press enter to continue'); 
   process.exit(0);
 }
