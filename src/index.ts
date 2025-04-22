@@ -65,7 +65,7 @@ class AndroidRemote extends EventEmitter {
             }
         }
 
-        this.remoteManager = new RemoteManager(this.host, this.remote_port, this.cert, this.timeout);
+        this.remoteManager = new RemoteManager(this.host, this.remote_port, this.cert.key!, this.cert.cert!, this.timeout);
 
         this.remoteManager.on('powered', (powered) => this.emit('powered', powered));
 
@@ -116,7 +116,7 @@ class AndroidRemote extends EventEmitter {
 
     stop(): void {
         this.pairingManager?.disconnect();
-        this.remoteManager?.stop();
+        this.remoteManager?.disconnect();
     }
 }
 
