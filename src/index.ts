@@ -1,8 +1,8 @@
-import { CertificateGenerator } from './certificate/CertificateGenerator';
-import { PairingManager } from './pairing/PairingManager';
-import { RemoteManager } from './remote/RemoteManager';
-import RemoteMessageManager from './remote/RemoteMessageManager';
-import EventEmitter from 'events';
+import { CertificateGenerator } from './CertificateGenerator';
+import { PairingManager } from './PairingManager';
+import { RemoteManager } from './RemoteManager';
+import {RemoteMessageManager} from './RemoteMessageManager';
+import {EventEmitter} from 'events';
 
 class AndroidRemote extends EventEmitter {
     private host: string;
@@ -46,7 +46,7 @@ class AndroidRemote extends EventEmitter {
                 'OU'
             );
 
-            this.pairingManager = new PairingManager(this.host, this.pairing_port, this.cert, this.service_name);
+            this.pairingManager = new PairingManager(this.host, this.pairing_port, this.cert.key!, this.cert.cert!, 5000, this.service_name);
             this.pairingManager.on('secret', () => this.emit('secret'));
 
             this.pairingManager.on('log', (...args) => this.emit('log', args));
@@ -54,7 +54,7 @@ class AndroidRemote extends EventEmitter {
             this.pairingManager.on('log.info', (...args) => this.emit('log.info', args));
             this.pairingManager.on('log.error', (...args) => this.emit('log.error', args));
 
-            let paired = await this.pairingManager.start()
+            let paired = await this.pairingManager.connect()
                 .catch((error) => {
                     this.emit('log.error', 'pairing manager start', error);
                     throw error;
@@ -91,8 +91,8 @@ class AndroidRemote extends EventEmitter {
         });
     }
 
-    sendCode(code: string): boolean | undefined {
-        return this.pairingManager?.sendCode(code);
+    sendCode(code: string): void {
+        this.pairingManager?.sendCode(code);
     }
 
     sendPower(): void {
@@ -115,7 +115,7 @@ class AndroidRemote extends EventEmitter {
     }
 
     stop(): void {
-        this.pairingManager?.stop();
+        this.pairingManager?.disconnect();
         this.remoteManager?.stop();
     }
 }

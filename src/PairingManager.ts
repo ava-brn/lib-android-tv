@@ -1,153 +1,132 @@
-import tls from 'tls';
 import Crypto from 'crypto-js';
-import { EventEmitter } from 'events';
+import tls from 'tls';
+import { Client } from './Client';
 import PairingMessageManager from './PairingMessageManager';
 
-export class PairingManager extends EventEmitter {
-    private readonly host: string;
-    private readonly port: number;
-    private chunks: Buffer;
-    private certs: { key?: string; cert?: string };
-    private readonly service_name: string;
-    private client: tls.TLSSocket | undefined;
+export class PairingManager extends Client {
+    private readonly serviceName: string;
     private pairingMessageManager: PairingMessageManager;
 
-    constructor(host: string, port: number, certs: { key?: string; cert?: string }, service_name: string) {
-        super();
-        this.host = host;
-        this.port = port;
-        this.chunks = Buffer.from([]);
-        this.certs = certs;
-        this.service_name = service_name;
+    constructor(
+        host: string,
+        port: number,
+        key: string,
+        cert: string,
+        connectionTimeout: number,
+        serviceName: string
+    ) {
+        super(host, port, key, cert, connectionTimeout);
+        this.serviceName = serviceName;
         this.pairingMessageManager = new PairingMessageManager();
     }
 
-    sendCode(code: string): boolean {
-        this.emit('log.debug', 'Sending code : ', code);
-        const code_bytes = this.hexStringToBytes(code);
+    async requestPairing() {
+        return new Promise(async (resolve, reject) => {
+            this.on('raw', (buffer) => {
+                const message = this.pairingMessageManager.parse(buffer);
+                this.emit('log', 'Receive : ' + JSON.stringify(message));
 
-        if (!this.client) {
-            this.emit('log.error', 'Client is not initialized.');
+                if (message.status !== this.pairingMessageManager.Status.STATUS_OK) {
+                    this.disconnect();
+                    this.emit('error', message.status?.toString() || 'Unknown error');
+                    return reject(message.status?.toString() || 'Unknown error');
+                }
+
+                if (message.pairingRequestAck) {
+                    this.socket?.write(this.pairingMessageManager.createPairingOption());
+                } else if (message.pairingOption) {
+                    this.socket?.write(this.pairingMessageManager.createPairingConfiguration());
+                } else if (message.pairingConfigurationAck) {
+                    resolve(true);
+                } else if (message.pairingSecretAck) {
+                    // Not an unkown message, but ignored here since it's handled by the sendCode method
+                } else {
+                    this.emit('log', `Unknown message from ${this.host}: '${JSON.stringify(message)}'`);
+                }
+            });
+
+            let connectionTimeout = setTimeout(() => {
+                this.emit('log', 'Inital connection timeout reached.');
+                this.disconnect();
+                reject('ConnectTimeout');
+            }, 5000);
+
+            await this.connect().catch((error) => reject(error));
+
+            clearTimeout(connectionTimeout);
+
+            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, 'ava-model'));
+        });
+    }
+
+    async sendCode(code: string): Promise<boolean> {
+        this.emit('log', 'Sending code : ', code);
+
+        if (!this.socket || this.socket.readyState !== 'open') {
+            this.emit('error', 'Client is not initialized.');
+            // throw new Error('Socket is not connected');
             return false;
         }
 
-        const client_certificate = this.client.getCertificate() as tls.PeerCertificate;
-        const server_certificate = this.client.getPeerCertificate() as tls.PeerCertificate;
+        const codeBytes = this.hexStringToBytes(code);
+        const hash = this.getHash(code);
+        const hashArray = this.hexStringToBytes(hash.toString());
 
-        if (!client_certificate || !server_certificate) {
-            this.client.destroy(new Error('No certificate'));
+        if (!hash || hashArray[0] !== codeBytes[0]) {
+            this.socket.destroy(new Error("Bad Code"));
+            return false;
+        } else {
+            return await new Promise((resolve, reject) => {
+                this.on('raw', (buffer) => {
+                    console.log('Raw buffer from sendCode');
+                    const message = this.pairingMessageManager.parse(buffer);
+                    this.emit('log', 'Receive [sendCode] : ' + JSON.stringify(message));
+
+                    if (message.status !== this.pairingMessageManager.Status.STATUS_OK) {
+                        this.disconnect();
+                        this.emit('error', message.status?.toString() || 'Unknown error');
+                        return reject(message.status?.toString() || 'Unknown error');
+                    }
+
+                    if (message.pairingSecretAck) {
+                        console.log('Paired! Closing connection (from sendCode)');
+                        resolve(true);
+                    } else {
+                        this.emit('log', `Unknown message from ${this.host}: '${JSON.stringify(message)}'`);
+                    }
+                });
+
+                this.socket?.write(this.pairingMessageManager.createPairingSecret(hashArray));
+            });
+        }
+    }
+
+    private getHash(code: string) {
+        const clientCert = this.socket!.getCertificate() as tls.PeerCertificate;
+        const serverCert = this.socket!.getPeerCertificate() as tls.PeerCertificate;
+
+        if (!clientCert || !serverCert) {
+            this.socket!.destroy(new Error('No certificate'));
             return false;
         }
 
         let sha256 = Crypto.algo.SHA256.create();
 
-        if (client_certificate.modulus === undefined
-            || client_certificate.exponent === undefined
-            || server_certificate.modulus === undefined
-            || server_certificate.exponent === undefined) {
-            this.client.destroy(new Error('No certificate'));
+        if (clientCert.modulus === undefined
+            || clientCert.exponent === undefined
+            || serverCert.modulus === undefined
+            || serverCert.exponent === undefined) {
+            this.socket!.destroy(new Error('No certificate'));
             return false;
         }
 
-        sha256.update(Crypto.enc.Hex.parse(client_certificate.modulus));
-        sha256.update(Crypto.enc.Hex.parse("0" + client_certificate.exponent.slice(2)));
-        sha256.update(Crypto.enc.Hex.parse(server_certificate.modulus));
-        sha256.update(Crypto.enc.Hex.parse("0" + server_certificate.exponent.slice(2)));
+        sha256.update(Crypto.enc.Hex.parse(clientCert.modulus));
+        sha256.update(Crypto.enc.Hex.parse("0" + clientCert.exponent.slice(2)));
+        sha256.update(Crypto.enc.Hex.parse(serverCert.modulus));
+        sha256.update(Crypto.enc.Hex.parse("0" + serverCert.exponent.slice(2)));
         sha256.update(Crypto.enc.Hex.parse(code.slice(2)));
 
-        let hash = sha256.finalize();
-        let hash_array = this.hexStringToBytes(hash.toString());
-        let check = hash_array[0];
-        if (check !== code_bytes[0]) {
-            this.client.destroy(new Error("Bad Code"));
-            return false;
-        } else {
-            this.client.write(this.pairingMessageManager.createPairingSecret(hash_array));
-            return true;
-        }
-    }
-
-    async start(): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            const options: tls.ConnectionOptions = {
-                key: this.certs.key,
-                cert: this.certs.cert,
-                port: this.port,
-                host: this.host,
-                rejectUnauthorized: false,
-            };
-
-            this.emit('log.debug', 'Start Pairing Connect');
-            this.client = tls.connect(options, () => {
-                this.emit('log.debug', this.host + ' Pairing connected');
-            }) as tls.TLSSocket;
-
-            if (!this.client) {
-                this.emit('log.error', 'Client is not initialized.');
-                reject(false);
-                return;
-            }
-
-            let connectionTimeout = setTimeout(() => {
-                this.emit('log.info', 'Inital connection timeout reached.');
-                this.client?.destroy();
-                reject('ConnectTimeout');
-            }, 5000);
-
-            this.client.on('secureConnect', () => {
-                this.emit('log.debug', this.host + ' Pairing secure connected ');
-                clearTimeout(connectionTimeout);
-                this.client?.write(this.pairingMessageManager.createPairingRequest(this.service_name, 'ava-model'));
-            });
-
-            this.client.on('data', (data) => {
-                const buffer = Buffer.from(data);
-                this.chunks = Buffer.concat([this.chunks, buffer]);
-
-                if (this.chunks.length > 0 && this.chunks.readInt8(0) === this.chunks.length - 1) {
-                    const message = this.pairingMessageManager.parse(this.chunks);
-
-                    this.emit('log.debug', 'Receive : ' + Array.from(this.chunks));
-                    this.emit('log.debug', 'Receive : ' + JSON.stringify(message));
-
-                    if (message.status !== this.pairingMessageManager.Status.STATUS_OK) {
-                        this.client?.destroy(new Error(message.status?.toString() || 'Unknown error'));
-                    } else {
-                        if (message.pairingRequestAck) {
-                            this.client?.write(this.pairingMessageManager.createPairingOption());
-                        } else if (message.pairingOption) {
-                            this.client?.write(this.pairingMessageManager.createPairingConfiguration());
-                        } else if (message.pairingConfigurationAck) {
-                            this.emit('secret');
-                        } else if (message.pairingSecretAck) {
-                            this.emit('log.debug', this.host + ' Paired!');
-                            this.client?.destroy();
-                        } else {
-                            this.emit('log.debug', this.host + ' What Else ?');
-                        }
-                    }
-                    this.chunks = Buffer.from([]);
-                }
-            });
-
-            this.client.on('close', (hasError) => {
-                this.emit('log.debug', this.host + ' Pairing Connection closed', hasError);
-                if (hasError) {
-                    reject(false);
-                } else {
-                    resolve(true);
-                }
-            });
-
-            this.client.on('error', (error) => {
-                this.emit('log.error', error);
-                reject(error);
-            });
-        });
-    }
-
-    stop(): void {
-        this.client?.destroy();
+        return sha256.finalize();
     }
 
     private hexStringToBytes(q: string): number[] {

@@ -1,10 +1,10 @@
-import protobufjs from 'protobufjs';
 import * as path from 'path';
+import protobufjs from 'protobufjs';
 import RemoteMessage from './RemoteMessage';
 
 const directory = __dirname;
 
-export default class RemoteMessageManager {
+export class RemoteMessageManager {
     private root: protobufjs.Root;
     private RemoteMessage: protobufjs.Type;
     public RemoteKeyCode: { [key: string]: number };

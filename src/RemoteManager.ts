@@ -1,6 +1,6 @@
-import tls from 'tls';
-import RemoteMessageManager from './RemoteMessageManager';
 import EventEmitter from 'events';
+import tls from 'tls';
+import { RemoteMessageManager } from './RemoteMessageManager';
 
 export class RemoteManager extends EventEmitter {
     private host: string;
