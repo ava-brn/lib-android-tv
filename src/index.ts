@@ -27,4 +27,6 @@ module.exports = {
     CertificateGenerator,
     RemoteKeyCode,
     RemoteDirection,
+    PairingManager,
+    RemoteManager,
 };

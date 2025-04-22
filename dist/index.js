@@ -17,5 +17,7 @@ module.exports = {
     CertificateGenerator: CertificateGenerator_1.CertificateGenerator,
     RemoteKeyCode,
     RemoteDirection,
+    PairingManager: PairingManager_1.PairingManager,
+    RemoteManager: RemoteManager_1.RemoteManager,
 };
 //# sourceMappingURL=index.js.map
