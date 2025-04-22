@@ -1,9 +1,9 @@
-import * as protobufjs from 'protobufjs';
 import * as path from 'path';
+import * as protobufjs from 'protobufjs';
 
 const directory = __dirname;
 
-export default class PairingMessageManager {
+export class PairingMessageManager {
     private root: protobufjs.Root;
     private PairingMessage: protobufjs.Type;
     public Status: { [key: string]: number };

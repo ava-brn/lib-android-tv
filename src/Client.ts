@@ -5,10 +5,10 @@ export class Client extends EventEmitter {
     protected host: string;
     protected port: number;
     protected socket?: TLSSocket;
-    private chunks: Buffer;
-    private connectionTimeout: number;
+    protected connectionTimeout: number;
     private key: string;
     private cert: string;
+    private chunks: Buffer;
 
     constructor(host: string, port: number, key: string, cert: string, connectionTimeout: number) {
         super();

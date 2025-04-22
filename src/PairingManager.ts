@@ -1,7 +1,7 @@
 import Crypto from 'crypto-js';
 import tls from 'tls';
 import { Client } from './Client';
-import PairingMessageManager from './PairingMessageManager';
+import { PairingMessageManager } from './PairingMessageManager';
 
 export class PairingManager extends Client {
     private readonly serviceName: string;
@@ -49,7 +49,7 @@ export class PairingManager extends Client {
                 this.emit('log', 'Inital connection timeout reached.');
                 this.disconnect();
                 reject('ConnectTimeout');
-            }, 5000);
+            }, this.connectionTimeout);
 
             await this.connect().catch((error) => reject(error));
 

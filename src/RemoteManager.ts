@@ -9,13 +9,13 @@ export class RemoteManager extends Client {
         port: number,
         key: string,
         cert: string,
-        timeout: number = 5000,
+        timeout: number = 10_000,
     ) {
         super(host, port, key, cert, timeout);
         this.remoteMessageManager = new RemoteMessageManager();
     }
 
-    async start(): Promise<void> {
+    async connect(): Promise<void> {
         this.on('raw', (buffer) => {
             const message = this.remoteMessageManager.parse(buffer);
             this.emit('log', this.host + ' Receive : ' + JSON.stringify(message));
@@ -83,9 +83,9 @@ export class RemoteManager extends Client {
         });
 
         // Ping is received every 5 seconds
-        this.socket?.setTimeout(1000 * 10);
+        this.socket?.setTimeout(this.connectionTimeout);
 
-        await this.connect();
+        await super.connect();
     }
 
     sendPower(): void {
