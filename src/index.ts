@@ -1,4 +1,6 @@
 import { CertificateGenerator } from './CertificateGenerator';
+import { PairingManager } from './PairingManager';
+import { RemoteManager } from './RemoteManager';
 import { RemoteMessageManager } from './RemoteMessageManager';
 
 const cert = CertificateGenerator.generateFull(
@@ -16,7 +18,9 @@ let RemoteDirection = (new RemoteMessageManager).RemoteDirection;
 export {
     CertificateGenerator,
     RemoteDirection,
-    RemoteKeyCode
+    RemoteKeyCode,
+    PairingManager,
+    RemoteManager,
 };
 
 module.exports = {

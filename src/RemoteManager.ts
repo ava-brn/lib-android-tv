@@ -2,6 +2,8 @@ import { Client } from './Client';
 import { RemoteMessageManager } from './RemoteMessageManager';
 
 export class RemoteManager extends Client {
+    public static PORT = 6466;
+
     private remoteMessageManager: RemoteMessageManager;
 
     constructor(
@@ -15,7 +17,7 @@ export class RemoteManager extends Client {
         this.remoteMessageManager = new RemoteMessageManager();
     }
 
-    async connect(): Promise<void> {
+    async connect(): Promise<boolean> {
         this.on('raw', (buffer) => {
             const message = this.remoteMessageManager.parse(buffer);
             this.emit('log', this.host + ' Receive : ' + JSON.stringify(message));
@@ -85,7 +87,7 @@ export class RemoteManager extends Client {
         // Ping is received every 5 seconds
         this.socket?.setTimeout(this.connectionTimeout);
 
-        await super.connect();
+        return await super.connect();
     }
 
     sendPower(): void {

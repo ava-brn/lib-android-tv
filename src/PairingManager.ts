@@ -4,6 +4,7 @@ import { Client } from './Client';
 import { PairingMessageManager } from './PairingMessageManager';
 
 export class PairingManager extends Client {
+    public static PORT = 6467;
     private readonly serviceName: string;
     private pairingMessageManager: PairingMessageManager;
 
@@ -96,6 +97,7 @@ export class PairingManager extends Client {
                     }
                 });
 
+                // Add timeout?
                 this.socket?.write(this.pairingMessageManager.createPairingSecret(hashArray));
             });
         }

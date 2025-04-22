@@ -27,7 +27,7 @@ export class Client extends EventEmitter {
         this.chunks = Buffer.from([]);
     }
 
-    async connect() {
+    async connect(): Promise<boolean> {
         return new Promise((resolve, reject) => {
             if (this.socket) {
                 if (this.socket.readyState === 'open') {
@@ -63,7 +63,7 @@ export class Client extends EventEmitter {
 
             this.socket.on('close', () => {
                 this.emit('log', 'Connection closed');
-                this.removeAllListeners('message');
+                this.removeAllListeners('raw');
             });
 
             this.socket.on('data', (data) => {
