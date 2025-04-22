@@ -63,7 +63,7 @@ export class Client extends EventEmitter {
 
             this.socket.on('close', () => {
                 this.emit('log', 'Connection closed');
-                this.removeAllListeners('raw');
+                this.removeAllListeners();
             });
 
             this.socket.on('data', (data) => {
