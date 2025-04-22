@@ -61,7 +61,7 @@ class Client extends node_events_1.EventEmitter {
             this.socket.on('end', () => this.emit('log', `The device ${this.host} closed the connection.`));
             this.socket.on('close', () => {
                 this.emit('log', 'Connection closed');
-                this.removeAllListeners('raw');
+                this.removeAllListeners();
             });
             this.socket.on('data', (data) => {
                 try {
