@@ -63,14 +63,14 @@ process.on('SIGINT', async () => {
 
 if (certstr) {
   pairer.on('message', console.log);
-  await remote.start().catch((e) => console.log('Start error', e));
+  await remote.connect().catch((e) => console.log('Start error', e));
   console.log('Connected. Waiting for 2s');  await new Promise(r => setTimeout(r, 15000));
 
   remote.sendKey(RemoteKeyCode.KEYCODE_DPAD_DOWN, RemoteDirection.SHORT);
 
   await new Promise(r => setTimeout(r, 5000));
 
-  remote.sendKey(RemoteKeyCode.KEYCODE_MUTE, RemoteDirection.SHORT);
+  remote.sendAppLink('netflix://');
 
   await new Promise(r => setTimeout(r, 1000));
 
