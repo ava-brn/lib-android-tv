@@ -1,7 +1,8 @@
-# androidtv-remote
+# Android TV Remote NodeJS Library
 
-[![npm-version](https://badgen.net/npm/v/androidtv-remote)](https://www.npmjs.com/package/androidtv-remote)
-[![npm-total-downloads](https://badgen.net/npm/dt/androidtv-remote)](https://www.npmjs.com/package/androidtv-remote)
+**Note: the readme is a bit outdated. It will be updated soon.**
+
+This is a hard-fork of <https://github.com/louis49/androidtv-remote/>, because the code was rewritten in Typescript.
 
 # Installation
 
