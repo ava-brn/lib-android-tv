@@ -8,7 +8,19 @@ Object.defineProperty(exports, "PairingManager", { enumerable: true, get: functi
 const RemoteManager_1 = require("./RemoteManager");
 Object.defineProperty(exports, "RemoteManager", { enumerable: true, get: function () { return RemoteManager_1.RemoteManager; } });
 const RemoteMessageManager_1 = require("./RemoteMessageManager");
-const cert = CertificateGenerator_1.CertificateGenerator.generateFull('Service Name', 'CNT', 'ST', 'LOC', 'O', 'OU');
+/*
+  Use the CertificateGenerator to generate new certificates:
+
+  CertificateGenerator.generateFull(
+    'Service Name',
+    'CNT',
+    'ST',
+    'LOC',
+    'O',
+    'OU'
+  );
+
+*/
 let RemoteKeyCode = (new RemoteMessageManager_1.RemoteMessageManager).RemoteKeyCode;
 exports.RemoteKeyCode = RemoteKeyCode;
 let RemoteDirection = (new RemoteMessageManager_1.RemoteMessageManager).RemoteDirection;
