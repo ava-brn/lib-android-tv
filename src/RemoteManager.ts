@@ -22,7 +22,7 @@ export class RemoteManager extends Client {
             const message = this.remoteMessageManager.parse(buffer);
             
             if (!message.remotePingRequest) {
-                this.emit('log', this.host + ' Receive : ' + JSON.stringify(message));                
+                this.emit('message', JSON.stringify(message));                
             }
 
             if (message.remoteConfigure) {

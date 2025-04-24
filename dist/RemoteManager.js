@@ -14,7 +14,7 @@ class RemoteManager extends Client_1.Client {
         this.on('raw', (buffer) => {
             const message = this.remoteMessageManager.parse(buffer);
             if (!message.remotePingRequest) {
-                this.emit('log', this.host + ' Receive : ' + JSON.stringify(message));
+                this.emit('message', JSON.stringify(message));
             }
             if (message.remoteConfigure) {
                 this.socket?.write(this.remoteMessageManager.createRemoteConfigure(622, 'Build.MODEL', 'Build.MANUFACTURER', 1, 'Build.VERSION.RELEASE'));
