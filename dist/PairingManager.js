@@ -10,10 +10,12 @@ const PairingMessageManager_1 = require("./PairingMessageManager");
 class PairingManager extends Client_1.Client {
     static PORT = 6467;
     serviceName;
+    modelName;
     pairingMessageManager;
-    constructor(host, port, key, cert, connectionTimeout, serviceName) {
+    constructor(host, port, key, cert, connectionTimeout, serviceName, modelName) {
         super(host, port, key, cert, connectionTimeout);
         this.serviceName = serviceName;
+        this.modelName = modelName || serviceName;
         this.pairingMessageManager = new PairingMessageManager_1.PairingMessageManager();
     }
     async requestPairing() {
@@ -49,7 +51,7 @@ class PairingManager extends Client_1.Client {
             }, this.connectionTimeout);
             await this.connect().catch((error) => reject(error));
             clearTimeout(connectionTimeout);
-            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, this.serviceName));
+            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, this.modelName));
         });
     }
     async sendCode(code) {

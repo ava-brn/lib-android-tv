@@ -6,6 +6,7 @@ import { PairingMessageManager } from './PairingMessageManager';
 export class PairingManager extends Client {
     public static PORT = 6467;
     private readonly serviceName: string;
+    private readonly modelName: string;
     private pairingMessageManager: PairingMessageManager;
 
     constructor(
@@ -14,10 +15,12 @@ export class PairingManager extends Client {
         key: string,
         cert: string,
         connectionTimeout: number,
-        serviceName: string
+        serviceName: string,
+        modelName?: string,
     ) {
         super(host, port, key, cert, connectionTimeout);
         this.serviceName = serviceName;
+        this.modelName = modelName || serviceName;
         this.pairingMessageManager = new PairingMessageManager();
     }
 
@@ -56,7 +59,7 @@ export class PairingManager extends Client {
 
             clearTimeout(connectionTimeout);
 
-            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, this.serviceName));
+            this.socket?.write(this.pairingMessageManager.createPairingRequest(this.serviceName, this.modelName));
         });
     }
 
