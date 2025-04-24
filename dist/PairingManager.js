@@ -22,7 +22,7 @@ class PairingManager extends Client_1.Client {
         return new Promise(async (resolve, reject) => {
             this.on('raw', (buffer) => {
                 const message = this.pairingMessageManager.parse(buffer);
-                this.emit('log', 'Receive : ' + JSON.stringify(message));
+                this.emit('message', JSON.stringify(message));
                 if (message.status !== this.pairingMessageManager.Status.STATUS_OK) {
                     this.disconnect();
                     this.emit('error', message.status?.toString() || 'Unknown error');
@@ -55,7 +55,7 @@ class PairingManager extends Client_1.Client {
         });
     }
     async sendCode(code) {
-        this.emit('log', 'Sending code : ', code);
+        this.emit('log', 'Sending code: ', code);
         if (!this.socket || this.socket.readyState !== 'open') {
             this.emit('error', 'Client is not initialized.');
             // throw new Error('Socket is not connected');
@@ -71,16 +71,15 @@ class PairingManager extends Client_1.Client {
         else {
             return await new Promise((resolve, reject) => {
                 this.on('raw', (buffer) => {
-                    console.log('Raw buffer from sendCode');
                     const message = this.pairingMessageManager.parse(buffer);
-                    this.emit('log', 'Receive [sendCode] : ' + JSON.stringify(message));
+                    this.emit('message', JSON.stringify(message));
                     if (message.status !== this.pairingMessageManager.Status.STATUS_OK) {
                         this.disconnect();
                         this.emit('error', message.status?.toString() || 'Unknown error');
                         return reject(message.status?.toString() || 'Unknown error');
                     }
                     if (message.pairingSecretAck) {
-                        console.log('Paired! Closing connection (from sendCode)');
+                        this.emit('log', 'Paired! Closing connection (from sendCode)');
                         resolve(true);
                     }
                     else {

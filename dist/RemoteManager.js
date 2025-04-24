@@ -86,9 +86,7 @@ class RemoteManager extends Client_1.Client {
         this.socket?.write(this.remoteMessageManager.createRemoteKeyInject(this.remoteMessageManager.RemoteDirection.SHORT, this.remoteMessageManager.RemoteKeyCode.KEYCODE_POWER));
     }
     sendKey(key, direction) {
-        this.socket?.write(this.remoteMessageManager.createRemoteKeyInject(direction, key), (e) => {
-            console.log('SendKey', e);
-        });
+        this.socket?.write(this.remoteMessageManager.createRemoteKeyInject(direction, key));
     }
     sendAppLink(app_link) {
         this.socket?.write(this.remoteMessageManager.createRemoteRemoteAppLinkLaunchRequest(app_link));

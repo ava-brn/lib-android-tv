@@ -98,9 +98,7 @@ export class RemoteManager extends Client {
     }
 
     sendKey(key: number, direction: number): void {
-        this.socket?.write(this.remoteMessageManager.createRemoteKeyInject(direction, key), (e) => {
-            console.log('SendKey', e);
-        });
+        this.socket?.write(this.remoteMessageManager.createRemoteKeyInject(direction, key));
     }
 
     sendAppLink(app_link: string): void {
