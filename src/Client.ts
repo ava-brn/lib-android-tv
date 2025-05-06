@@ -42,10 +42,10 @@ export class Client extends EventEmitter {
                     })
                 }
 
-                this.emit('log', 'Socket exists, but not connecting. Destroy and try again');
-                this.socket.removeAllListeners();
+                this.emit('log', 'Socket exists, but not connecting. Destroy and try again', this.socket.readyState);
+                // this.socket.removeAllListeners();
                 this.socket.destroy();
-                this.removeAllListeners();
+                // this.removeAllListeners();
             }
 
             this.emit('log', 'Creating socket');
@@ -65,6 +65,7 @@ export class Client extends EventEmitter {
 
             this.socket.on('close', () => {
                 this.emit('log', 'Connection closed');
+                this.socket?.removeAllListeners();
                 this.removeAllListeners();
             });
 

@@ -45,10 +45,10 @@ class Client extends node_events_1.EventEmitter {
                         resolve(false);
                     });
                 }
-                this.emit('log', 'Socket exists, but not connecting. Destroy and try again');
-                this.socket.removeAllListeners();
+                this.emit('log', 'Socket exists, but not connecting. Destroy and try again', this.socket.readyState);
+                // this.socket.removeAllListeners();
                 this.socket.destroy();
-                this.removeAllListeners();
+                // this.removeAllListeners();
             }
             this.emit('log', 'Creating socket');
             this.socket = (0, node_tls_1.connect)(this.options, () => {
@@ -63,6 +63,7 @@ class Client extends node_events_1.EventEmitter {
             this.socket.on('end', () => this.emit('log', `The device ${this.host} closed the connection.`));
             this.socket.on('close', () => {
                 this.emit('log', 'Connection closed');
+                this.socket?.removeAllListeners();
                 this.removeAllListeners();
             });
             this.socket.on('data', (data) => {
