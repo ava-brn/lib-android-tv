@@ -77,7 +77,7 @@ export class RemoteManager extends Client {
             }
         });
 
-        console.log('RAW LISTENERS', this.socket?.listenerCount('raw'));
+        console.log('RAW LISTENERS', this.listenerCount('raw'));
 
         this.socket?.on('timeout', () => {
             this.emit('log', 'timeout');
