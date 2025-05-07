@@ -46,9 +46,7 @@ class Client extends node_events_1.EventEmitter {
                     });
                 }
                 this.emit('log', 'Socket exists, but not connecting. Destroy and try again', this.socket.readyState);
-                // this.socket.removeAllListeners();
                 this.socket.destroy();
-                // this.removeAllListeners();
             }
             this.emit('log', 'Creating socket');
             this.socket = (0, node_tls_1.connect)(this.options, () => {
